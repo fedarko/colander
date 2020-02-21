@@ -1,0 +1,21 @@
+digraph G {
+    rankdir="LR";
+    subgraph {
+        rank="min";
+        4;
+    }
+    subgraph {
+        rank="same";
+        7;
+        8;
+    }
+    6 -> 7 [label = "25x", color=red];
+    6 -> 8 [label = "15x", color=blue];
+    7 -> 1 [label = "25x", color=red];
+    8 -> 1 [label = "15x", color=blue];
+    1 -> 2 [label = "40x", color=purple];
+    2 -> 3 [label = "40x", color=purple];
+    3 -> 4 [label = "40x", color=purple];
+    4 -> 5 [label = "40x", color=purple];
+    5 -> 6 [label = "40x", color=purple];
+}
