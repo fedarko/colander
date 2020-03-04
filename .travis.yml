@@ -7,6 +7,7 @@ install:
     - conda create -n colander -c defaults python=3.6 networkx graphviz=2.38.0 pygraphviz numpy pytest pytest-cov
 script:
     - make test
+    - make stylecheck
 after_success:
     - wget -O codecov.sh https://codecov.io/bash
     # Upload coverage information

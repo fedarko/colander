@@ -5,8 +5,9 @@ test:
 	python3 -B -m pytest colander/tests --cov colander
 
 stylecheck:
-	flake8 *
-	black --check -l 79 *
+	@# both of these ignored things are things that black and flake8 disagree on
+	flake8 --ignore=E203,W503 colander
+	black --check -l 79 colander
 
 style:
-	black -l 79 *
+	black -l 79 colander

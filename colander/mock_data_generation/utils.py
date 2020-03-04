@@ -65,10 +65,18 @@ def generate_strain(genome, hv_regions, hvmp, nmp):
             sg = sg[: m.coordinate + shift] + sg[m.coordinate + shift + 1 :]
             shift -= 1
         elif m.mtype == "insertion":
-            sg = sg[: m.coordinate + shift] + m.new_nt + sg[m.coordinate + shift :]
+            sg = (
+                sg[: m.coordinate + shift]
+                + m.new_nt
+                + sg[m.coordinate + shift :]
+            )
             shift += 1
         elif m.mtype == "mutation":
-            sg = sg[: m.coordinate + shift] + m.new_nt + sg[m.coordinate + shift + 1 :]
+            sg = (
+                sg[: m.coordinate + shift]
+                + m.new_nt
+                + sg[m.coordinate + shift + 1 :]
+            )
         else:
             raise ValueError("Invalid mutation mtype: {}".format(m.mtype))
     return sg
