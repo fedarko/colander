@@ -4,7 +4,7 @@ python:
     - "3.6"
     - "3.7"
 install:
-    - conda create -n colander -c defaults python=3.6 networkx graphviz=2.38.0 pygraphviz numpy pytest pytest-cov
+    - pip install numpy networkx pytest pytest-cov
 script:
     - make test
     - make stylecheck
