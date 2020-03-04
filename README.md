@@ -1,4 +1,7 @@
 # colander
+[![Build Status](https://travis-ci.com/fedarko/colander.svg?branch=master)](https://travis-ci.com/fedarko/colander)
+[![Code Coverage](https://codecov.io/gh/fedarko/colander/branch/master/graph/badge.svg)](https://codecov.io/gh/fedarko/colander)
+
 Estimates the number of strains present in a connected component of a
 metagenome assembly graph.
 
