@@ -1,8 +1,13 @@
 import random
 
+nts = set(["A", "C", "T", "G"])
 
-def rand_nt():
-    return random.choice(["A", "C", "T", "G"])
+def rand_nt(exclude=None):
+    if exclude is not None:
+        nts_to_consider = list(nts.difference(exclude))
+    else:
+        nts_to_consider = list(nts)
+    return random.choice(nts_to_consider)
 
 
 class Strain:
@@ -15,11 +20,29 @@ class Mutation:
     def __init__(self, coordinate, curr_nt):
         self.coordinate = coordinate
         self.curr_nt = curr_nt
+        # Randomly determine mutation "type" and the corresponding sequence
+        # modification
         self.mtype = random.choice(["insertion", "deletion", "mutation"])
-        if self.mtype == "insertion" or self.mtype == "mutation":
+        if self.mtype == "insertion":
             self.new_nt = rand_nt()
+        elif self.mtype == "mutation":
+            self.new_nt = rand_nt(exclude=self.curr_nt)
         else:
             self.new_nt = None
+
+    def __repr__(self):
+        if self.mtype == "insertion":
+            return "insertion at pos {}: {} -> {}{}".format(
+                self.coordinate, self.curr_nt, self.new_nt, self.curr_nt
+            )
+        elif self.mtype == "deletion":
+            return "deletion at pos {}: {} -> '' ".format(
+                self.coordinate, self.curr_nt
+            )
+        elif self.mtype == "mutation":
+            return "mutation at pos {}: {} -> {}".format(
+                self.coordinate, self.curr_nt, self.new_nt
+            )
 
 
 def generate_random_sequence(length):
@@ -28,6 +51,46 @@ def generate_random_sequence(length):
     for i in range(length):
         s += rand_nt()
     return s
+
+def add_mutations(seq, mutations):
+    """Returns a modified DNA sequence based on a list of Mutation objects."""
+    # Indels mess up coordinates, so what we do is keep track of our "shift" --
+    # a negative shift when we're at a given coordinate implies more deletions
+    # than insertions to the left of that coordinate, and a positive shift
+    # similarly implies more insertions than deletions to the left.
+    # The reason we can get away with this is that, when creating mutations and
+    # when applying mutations, we traverse the genome from left to right (...
+    # i.e. 0 to len(genome)) consistently. So when applying a mutation at
+    # coordinate C, we only need to worry about the mutations to the left of
+    # that mutation.
+    seq2 = seq
+    shift = 0
+    print(seq2)
+    for m in mutations:
+        print(m)
+        if m.mtype == "deletion":
+            seq2 = (
+                seq2[: m.coordinate + shift]
+                + seq2[m.coordinate + shift + 1 :]
+            )
+            shift -= 1
+        elif m.mtype == "insertion":
+            seq2 = (
+                seq2[: m.coordinate + shift]
+                + m.new_nt
+                + seq2[m.coordinate + shift :]
+            )
+            shift += 1
+        elif m.mtype == "mutation":
+            seq2 = (
+                seq2[: m.coordinate + shift]
+                + m.new_nt
+                + seq2[m.coordinate + shift + 1 :]
+            )
+        else:
+            raise ValueError("Invalid mutation mtype: {}".format(m.mtype))
+        print(seq2)
+    return seq2
 
 
 def generate_strain(genome, hv_regions, hvmp, nmp):
@@ -41,45 +104,16 @@ def generate_strain(genome, hv_regions, hvmp, nmp):
                 in_hv = False
                 curr_hv += 1
         else:
-            if c > hv_regions[curr_hv + 1][0]:
-                in_hv = True
+            if curr_hv + 1 < len(hv_regions):
+               if c > hv_regions[curr_hv + 1][0]:
+                   in_hv = True
 
         mutation_threshold = hvmp if in_hv else nmp
         mp = random.random()
         if mp < mutation_threshold:
             # Add a random mutation
-            mutations_to_add.append(Mutation(c))
-    sg = genome
-    # Indels mess up coordinates, so what we do is keep track of our "shift" --
-    # a negative shift when we're at a given coordinate implies more deletions
-    # than insertions to the left of that coordinate, and a positive shift
-    # similarly implies more insertions than deletions to the left.
-    # The reason we can get away with this is that, when creating mutations and
-    # when applying mutations, we traverse the genome from left to right (...
-    # i.e. 0 to len(genome)) consistently. So when applying a mutation at
-    # coordinate C, we only need to worry about the mutations to the left of
-    # that mutation.
-    shift = 0
-    for m in mutations_to_add:
-        if m.mtype == "deletion":
-            sg = sg[: m.coordinate + shift] + sg[m.coordinate + shift + 1 :]
-            shift -= 1
-        elif m.mtype == "insertion":
-            sg = (
-                sg[: m.coordinate + shift]
-                + m.new_nt
-                + sg[m.coordinate + shift :]
-            )
-            shift += 1
-        elif m.mtype == "mutation":
-            sg = (
-                sg[: m.coordinate + shift]
-                + m.new_nt
-                + sg[m.coordinate + shift + 1 :]
-            )
-        else:
-            raise ValueError("Invalid mutation mtype: {}".format(m.mtype))
-    return sg
+            mutations_to_add.append(Mutation(c, genome[c]))
+    return add_mutations(genome, mutations_to_add)
 
 
 def generate_strains_from_genome(
