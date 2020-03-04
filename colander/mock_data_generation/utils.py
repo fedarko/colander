@@ -2,6 +2,7 @@ import random
 
 nts = set(["A", "C", "T", "G"])
 
+
 def rand_nt(exclude=None):
     if exclude is not None:
         nts_to_consider = list(nts.difference(exclude))
@@ -52,6 +53,7 @@ def generate_random_sequence(length):
         s += rand_nt()
     return s
 
+
 def add_mutations(seq, mutations):
     """Returns a modified DNA sequence based on a list of Mutation objects."""
     # Indels mess up coordinates, so what we do is keep track of our "shift" --
@@ -70,8 +72,7 @@ def add_mutations(seq, mutations):
         print(m)
         if m.mtype == "deletion":
             seq2 = (
-                seq2[: m.coordinate + shift]
-                + seq2[m.coordinate + shift + 1 :]
+                seq2[: m.coordinate + shift] + seq2[m.coordinate + shift + 1 :]
             )
             shift -= 1
         elif m.mtype == "insertion":
@@ -105,8 +106,8 @@ def generate_strain(genome, hv_regions, hvmp, nmp):
                 curr_hv += 1
         else:
             if curr_hv + 1 < len(hv_regions):
-               if c > hv_regions[curr_hv + 1][0]:
-                   in_hv = True
+                if c > hv_regions[curr_hv + 1][0]:
+                    in_hv = True
 
         mutation_threshold = hvmp if in_hv else nmp
         mp = random.random()
