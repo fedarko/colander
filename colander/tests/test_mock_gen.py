@@ -9,6 +9,7 @@ from colander.mock_data_generation.utils import (
     generate_strain,
     generate_strains_from_genome,
     shear_into_kmers,
+    make_debruijn_graph,
 )
 
 
@@ -178,3 +179,21 @@ def test_kmer_shearing_basic():
     assert set(kmers) == set(
         ["AAACCCGG", "AACCCGGG", "ACCCGGGT", "CCCGGGTT", "CCGGGTTT"]
     )
+
+
+def test_make_debruijn_graph():
+    # Example data from slide 5 in
+    # https://www.cs.jhu.edu/~langmea/resources/lecture_notes/assembly_dbg.pdf
+    kmers = ["AAA", "AAB", "ABB", "BBB", "BBA"]
+    g = make_debruijn_graph(kmers)
+
+    assert len(g.nodes) == 4
+    assert len(g.edges) == 5
+
+    # check that there's a one-to-one correspondence btwn. kmers and edges
+    for e in g.edges:
+        edge_kmer = e[0] + e[1][-1]
+        assert edge_kmer in kmers
+        kmers.remove(edge_kmer)
+
+    assert set(g.nodes) == set(["AA", "AB", "BA", "BB"])

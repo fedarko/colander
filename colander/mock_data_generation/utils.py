@@ -302,4 +302,10 @@ def make_debruijn_graph(kmers):
         dbg: networkx.MultiDiGraph
     """
     g = networkx.MultiDiGraph()
-    return NotImplementedError
+    for kmer in kmers:
+        prefix = kmer[:-1]
+        suffix = kmer[1:]
+        # This takes care of adding nodes (k-1-mers) not yet in the graph, as
+        # well as of allowing multi-edges between the same k-1-mers.
+        g.add_edge(prefix, suffix)
+    return g
