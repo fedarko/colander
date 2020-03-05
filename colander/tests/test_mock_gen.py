@@ -47,7 +47,7 @@ def test_mutation():
             )
         else:
             assert m.__repr__() == (
-                "mutation at pos {}: {} -> {}".format(i, c, m.new_nt)
+                "substitution at pos {}: {} -> {}".format(i, c, m.new_nt)
             )
             assert m.new_nt != c
 
@@ -64,7 +64,7 @@ def test_add_mutations():
     m1.make_insertion("T")
 
     m2 = Mutation(3, "T")
-    m2.make_mutation("C")
+    m2.make_substitution("C")
 
     m3 = Mutation(7, "C")
     m3.make_deletion()
