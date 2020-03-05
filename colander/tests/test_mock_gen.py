@@ -1,3 +1,4 @@
+import pytest
 from colander.mock_data_generation.utils import (
     rand_nt,
     generate_random_sequence,
@@ -66,6 +67,11 @@ def test_add_mutations():
     m3.make_deletion()
     assert add_mutations(s, [m1, m2, m3]) == "TACGCAAA"
 
+
+def test_add_indeterminate_mutation():
+    m = Mutation(0, "A")
+    with pytest.raises(ValueError):
+        add_mutations("ACTG", [m])
 
 def test_gen_mutations():
     g = "ATCGAACGATAAACTAGACCCAA"
