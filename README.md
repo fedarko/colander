@@ -11,5 +11,5 @@ in the Winter 2020 quarter at UC San Diego.
 ## Installation
 
 ```bash
-conda create -n colander -c defaults python=3.6 networkx graphviz=2.38.0 pygraphviz numpy
+pip install git+https://github.com/fedarko/colander.git
 ```

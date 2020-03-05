@@ -90,9 +90,7 @@ def add_mutations(seq, mutations):
     # that mutation.
     seq2 = seq
     shift = 0
-    print(seq2)
     for m in mutations:
-        print(m)
         if m.mtype == "deletion":
             seq2 = (
                 seq2[: m.coordinate + shift] + seq2[m.coordinate + shift + 1 :]
@@ -113,7 +111,6 @@ def add_mutations(seq, mutations):
             )
         else:
             raise ValueError("Invalid mutation mtype: {}".format(m.mtype))
-        print(seq2)
     return seq2
 
 
