@@ -1,4 +1,5 @@
 import random
+from collections import Counter
 import networkx
 
 nts = set(["A", "C", "T", "G"])
@@ -299,13 +300,18 @@ def make_debruijn_graph(kmers):
 
     Returns
     -------
-        dbg: networkx.MultiDiGraph
+        dbg: networkx.DiGraph
+            In this graph, multi-edges are collapsed into a single edge.
+            Coverage information (i.e. how many times a given edge was present
+            in the input k-mer data) is stored in the 'cov' attribute of the
+            edge.
     """
-    g = networkx.MultiDiGraph()
+    g = networkx.DiGraph()
+    edge_counter = Counter()
     for kmer in kmers:
         prefix = kmer[:-1]
         suffix = kmer[1:]
-        # This takes care of adding nodes (k-1-mers) not yet in the graph, as
-        # well as of allowing multi-edges between the same k-1-mers.
-        g.add_edge(prefix, suffix)
+        edge_counter[(prefix, suffix)] += 1
+    for edge in edge_counter:
+        g.add_edge(edge[0], edge[1], cov=edge_counter[edge])
     return g
