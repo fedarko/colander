@@ -1,4 +1,5 @@
 import random
+import networkx
 
 nts = set(["A", "C", "T", "G"])
 
@@ -239,13 +240,14 @@ def generate_strains_from_genome(
     return out_strains
 
 
-def shear_into_reads(seq, coverage, read_length, error_probability=0):
-    """Breaks a sequence into reads.
+def shear_into_kmers(seq, coverage, k, error_probability=0):
+    """Generates the k-mer composition of a sequence, with a specified
+       coverage. Also randomly applies substitution "errors" to these k-mers.
 
-       This function is fairly unrealistic, compared to actual shotgun
-       sequencing. (e.g. reads are not always created from the same places in
-       the genome...) However, for the purposes of simulation for a class
-       project, this should be ok :)
+       Treating these k-mers as "reads" is a bit unrealistic (since this
+       assumes perfect 1x coverage when coverage = 1, perfect 2x coverage when
+       coverage = 2, ...), but this should be good enough for a class project's
+       simulation.
 
     Parameters
     ----------
@@ -253,38 +255,51 @@ def shear_into_reads(seq, coverage, read_length, error_probability=0):
 
         coverage: int
 
-        read_length: int
+        k: int
+            Must be less than len(seq).
 
         error_probability: float
             Probability of an error (defined as just a substitution mutation).
-            If you make this 0, the reads will be "error-free."
+            If you make this 0, the kmers will be "error-free."
     Returns
     -------
-        reads: list of str
+        kmers: list of str
     """
-    reads = []
+    kmers = []
     for c in range(coverage):
-        # Shear off read_length characters from the start of the sequence
-        # repeatedly. There's probably a more efficient way to do this.
-        # e.g. AAACCCGGGTTT, read_length = 5:
-        #      AAACC
-        #           CGGGT
-        #                TT
-        # When seq_copy gets to be less than read_length characters, this
-        # will still work as intended -- it'll just add a read of length
-        # len(seq) % read_length to reads.
-        seq_copy = seq
-        while len(seq_copy) > 0:
-            reads.append(seq_copy[0:read_length])
-            seq_copy = seq_copy[read_length:]
+        # Shear off kmer_length characters from the start of the sequence
+        # repeatedly.
+        # e.g. AAACCCGGGTTT, k = 8:
+        #      AAACCCGG
+        #       AACCCGGG
+        #        ACCCGGGT
+        #         CCCGGGTT
+        #          CCGGGTTT
+        for i in range(len(seq) - k + 1):
+            kmers.append(seq[i : i + k])
 
-    # apply errors to reads
-    for i in range(len(reads)):
-        errored_read = add_mutations(
-            reads[i],
+    # randomly apply substitution errors to k-mers
+    for i in range(len(kmers)):
+        errored_kmer = add_mutations(
+            kmers[i],
             generate_mutations(
-                reads[i], [], 0, error_probability, only_subs=True
+                kmers[i], [], 0, error_probability, only_subs=True
             ),
         )
-        reads[i] = errored_read
-    return reads
+        kmers[i] = errored_kmer
+    return kmers
+
+
+def make_debruijn_graph(kmers):
+    """Constructs a de Bruijn graph from a list of kmers.
+
+    Parameters
+    ----------
+        kmers: list of str
+
+    Returns
+    -------
+        dbg: networkx.MultiDiGraph
+    """
+    g = networkx.MultiDiGraph()
+    return NotImplementedError
