@@ -21,15 +21,36 @@ class Mutation:
     def __init__(self, coordinate, curr_nt):
         self.coordinate = coordinate
         self.curr_nt = curr_nt
-        # Randomly determine mutation "type" and the corresponding sequence
-        # modification
-        self.mtype = random.choice(["insertion", "deletion", "mutation"])
-        if self.mtype == "insertion":
+        self.mtype = "indeterminate"
+        self.new_nt = None
+
+    def make_insertion(self, new_nt=None):
+        self.mtype = "insertion"
+        if new_nt is None:
             self.new_nt = rand_nt()
-        elif self.mtype == "mutation":
+        else:
+            self.new_nt = new_nt
+
+    def make_deletion(self):
+        self.mtype = "deletion"
+        self.new_nt = None
+
+    def make_mutation(self, new_nt=None):
+        self.mtype = "mutation"
+        if new_nt is None:
             self.new_nt = rand_nt(exclude=self.curr_nt)
         else:
-            self.new_nt = None
+            self.new_nt = new_nt
+
+    def randomly_initialize(self):
+        # Randomly determine mutation "type" then adjust
+        r = random.random()
+        if r < 1/3:
+            self.make_insertion()
+        elif r < 2/3:
+            self.make_deletion()
+        else:
+            self.make_mutation()
 
     def __repr__(self):
         if self.mtype == "insertion":
@@ -45,7 +66,7 @@ class Mutation:
                 self.coordinate, self.curr_nt, self.new_nt
             )
         else:
-            raise ValueError("Mutation has invalid mtype")
+            return "indeterminate mutation"
 
 
 def generate_random_sequence(length):
@@ -115,7 +136,9 @@ def generate_strain(genome, hv_regions, hvmp, nmp):
         mp = random.random()
         if mp < mutation_threshold:
             # Add a random mutation
-            mutations_to_add.append(Mutation(c, genome[c]))
+            m = Mutation(c, genome[c])
+            m.randomly_initialize()
+            mutations_to_add.append(m)
     return add_mutations(genome, mutations_to_add)
 
 

@@ -3,6 +3,7 @@ from colander.mock_data_generation.utils import (
     rand_nt,
     generate_random_sequence,
     Mutation,
+    add_mutations,
 )
 
 
@@ -31,6 +32,7 @@ def test_mutation():
     for i in range(100):
         c = nts[i // 25]
         m = Mutation(i, c)
+        m.randomly_initialize()
         if m.mtype == "insertion":
             assert m.__repr__() == (
                 "insertion at pos {}: {} -> {}{}".format(i, c, m.new_nt, c)
@@ -46,8 +48,20 @@ def test_mutation():
             assert m.new_nt != c
 
 
-def test_invalid_mutation():
+def test_indeterminate_mutation():
     m = Mutation(3, "A")
-    m.mtype = "lol"
-    with pytest.raises(ValueError):
-        m.__repr__()
+    assert m.__repr__() == "indeterminate mutation"
+
+
+def test_add_mutations():
+    s = "ACGTAAAC"
+    # Deterministically create mutations
+    m1 = Mutation(0, "A")
+    m1.make_insertion("T")
+
+    m2 = Mutation(3, "T")
+    m2.make_mutation("C")
+
+    m3 = Mutation(7, "C")
+    m3.make_deletion()
+    assert add_mutations(s, [m1, m2, m3]) == "TACGCAAA"
