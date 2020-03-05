@@ -117,8 +117,8 @@ def add_mutations(seq, mutations):
     return seq2
 
 
-def generate_strain(genome, hv_regions, hvmp, nmp):
-    """Creates and then applies mutations to a DNA sequence."""
+def generate_mutations(genome, hv_regions, hvmp, nmp):
+    """Determines where to place mutations on a DNA sequence."""
     mutations_to_add = []
     in_hv = False
     curr_hv = -1
@@ -129,7 +129,7 @@ def generate_strain(genome, hv_regions, hvmp, nmp):
                 curr_hv += 1
         else:
             if curr_hv + 1 < len(hv_regions):
-                if c > hv_regions[curr_hv + 1][0]:
+                if c >= hv_regions[curr_hv + 1][0]:
                     in_hv = True
 
         mutation_threshold = hvmp if in_hv else nmp
@@ -139,7 +139,13 @@ def generate_strain(genome, hv_regions, hvmp, nmp):
             m = Mutation(c, genome[c])
             m.randomly_initialize()
             mutations_to_add.append(m)
-    return add_mutations(genome, mutations_to_add)
+    return mutations_to_add
+
+
+def generate_strain(genome, hv_regions, hvmp, nmp):
+    """Creates and then applies mutations to a DNA sequence."""
+    mutations = generate_mutations(genome, hv_regions, hvmp, nmp)
+    return add_mutations(genome, mutations)
 
 
 def generate_strains_from_genome(

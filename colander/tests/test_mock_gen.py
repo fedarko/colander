@@ -2,6 +2,7 @@ from colander.mock_data_generation.utils import (
     rand_nt,
     generate_random_sequence,
     Mutation,
+    generate_mutations,
     add_mutations,
 )
 
@@ -64,3 +65,12 @@ def test_add_mutations():
     m3 = Mutation(7, "C")
     m3.make_deletion()
     assert add_mutations(s, [m1, m2, m3]) == "TACGCAAA"
+
+
+def test_gen_mutations():
+    g = "ATCGAACGATAAACTAGACCCAA"
+    hv_regions = [(3, 9)]
+    hvmp = 1
+    nmp = 0
+    muts = generate_mutations(g, hv_regions, hvmp, nmp)
+    assert [m.coordinate for m in muts] == list(range(3, 10))
