@@ -45,9 +45,9 @@ class Mutation:
     def randomly_initialize(self):
         # Randomly determine mutation "type" then adjust
         r = random.random()
-        if r < 1/3:
+        if r < 1 / 3:
             self.make_insertion()
-        elif r < 2/3:
+        elif r < 2 / 3:
             self.make_deletion()
         else:
             self.make_mutation()
