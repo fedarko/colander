@@ -6,6 +6,7 @@ from colander.mock_data_generation.utils import (
     generate_mutations,
     add_mutations,
     generate_strain,
+    generate_strains_from_genome,
 )
 
 
@@ -98,3 +99,25 @@ def test_generate_strain():
         # Since there's a hypervariable region mutation probability of 1, there
         # should have been 2 mutations for each of the 2 bases in the HV region
         assert len(strain.originating_mutations) == 2
+
+
+def test_generate_strains_from_genome():
+    #     ***    -- the *s indicate the hypervariable region for this "genome"
+    #    012345
+    g = "GGGGGG"
+    covs = [10, 1, 5]
+    hv_regions = [(1, 3)]
+    hvmp = 1
+    nmp = 0
+    for i in range(100):
+        strains = generate_strains_from_genome(
+            g,
+            covs,
+            hv_regions,
+            hypervariable_mutation_probability=hvmp,
+            normal_mutation_probability=nmp,
+        )
+        for s, cov in zip(strains, covs):
+            assert s.seq.endswith("GG")
+            assert len(s.originating_mutations) == 3
+            assert s.coverage == cov
