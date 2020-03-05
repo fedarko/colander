@@ -11,10 +11,12 @@ def test_rand_nt():
         n = rand_nt()
         assert n in ["A", "C", "G", "T"]
 
+
 def test_rand_nt_exclude():
     for i in range(100):
         n = rand_nt(exclude="A")
         assert n in ["C", "G", "T"]
+
 
 def test_generate_random_sequence():
     for i in range(100):
@@ -22,6 +24,7 @@ def test_generate_random_sequence():
         assert len(seq) == i
         for nt in seq:
             assert nt in ["A", "C", "G", "T"]
+
 
 def test_mutation():
     nts = ["A", "C", "G", "T"]
@@ -41,6 +44,7 @@ def test_mutation():
                 "mutation at pos {}: {} -> {}".format(i, c, m.new_nt)
             )
             assert m.new_nt != c
+
 
 def test_invalid_mutation():
     m = Mutation(3, "A")
