@@ -37,13 +37,15 @@ class Mutation:
                 self.coordinate, self.curr_nt, self.new_nt, self.curr_nt
             )
         elif self.mtype == "deletion":
-            return "deletion at pos {}: {} -> '' ".format(
+            return "deletion at pos {}: {} -> ''".format(
                 self.coordinate, self.curr_nt
             )
         elif self.mtype == "mutation":
             return "mutation at pos {}: {} -> {}".format(
                 self.coordinate, self.curr_nt, self.new_nt
             )
+        else:
+            raise ValueError("Mutation has invalid mtype")
 
 
 def generate_random_sequence(length):
