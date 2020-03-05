@@ -1,4 +1,3 @@
-import pytest
 from colander.mock_data_generation.utils import (
     rand_nt,
     generate_random_sequence,
