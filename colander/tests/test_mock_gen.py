@@ -4,6 +4,7 @@ from colander.mock_data_generation.utils import (
     generate_random_sequence,
     Mutation,
     generate_mutations,
+    validate_genomic_regions,
     add_mutations,
     generate_strain,
     generate_strains_from_genome,
@@ -121,3 +122,27 @@ def test_generate_strains_from_genome():
             assert s.seq.endswith("GG")
             assert len(s.originating_mutations) == 3
             assert s.coverage == cov
+
+
+def test_genomic_region_validation():
+    genome = "ACGTA"
+
+    with pytest.raises(ValueError) as exc_info:
+        validate_genomic_regions(genome, [(0, 1, 2)])
+    assert "=/= 2 coordinates" in str(exc_info.value)
+
+    with pytest.raises(ValueError) as exc_info:
+        validate_genomic_regions(genome, [(-1, 1)])
+    assert "Out-of-range genomic coordinate" in str(exc_info.value)
+
+    with pytest.raises(ValueError) as exc_info:
+        validate_genomic_regions(genome, [(2, 1)])
+    assert "Backwards region" in str(exc_info.value)
+
+    with pytest.raises(ValueError) as exc_info:
+        validate_genomic_regions(genome, [(3, 4), (1, 2)])
+    assert "Regions out of order" in str(exc_info.value)
+
+    with pytest.raises(ValueError) as exc_info:
+        validate_genomic_regions(genome, [(1, 4), (3, 4)])
+    assert "overlapping" in str(exc_info.value)

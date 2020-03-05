@@ -121,14 +121,14 @@ def validate_genomic_regions(genome, regions):
     prev_region_end = -1
     for region in regions:
         if len(region) != 2:
-            raise ValueError("HV region with =/= 2 coordinates.")
+            raise ValueError("Region with =/= 2 coordinates.")
         for coord in region:
             if coord not in range(0, len(genome)):
-                raise ValueError("Invalid coord in HV region.")
+                raise ValueError("Out-of-range genomic coordinate in region.")
         if region[1] <= region[0]:
-            raise ValueError("Backwards HV region.")
+            raise ValueError("Backwards region.")
         if region[0] <= prev_region_end:
-            raise ValueError("HV regions out of order and/or overlapping.")
+            raise ValueError("Regions out of order and/or overlapping.")
         prev_region_end = region[1]
 
 
