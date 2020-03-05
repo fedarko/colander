@@ -115,8 +115,26 @@ def add_mutations(seq, mutations):
     return seq2
 
 
+def validate_genomic_regions(genome, regions):
+    """Validates a list of "regions" (coordinates along a genome string)."""
+
+    prev_region_end = -1
+    for region in regions:
+        if len(region) != 2:
+            raise ValueError("HV region with =/= 2 coordinates.")
+        for coord in region:
+            if coord not in range(0, len(genome)):
+                raise ValueError("Invalid coord in HV region.")
+        if region[1] <= region[0]:
+            raise ValueError("Backwards HV region.")
+        if region[0] <= prev_region_end:
+            raise ValueError("HV regions out of order and/or overlapping.")
+        prev_region_end = region[1]
+
+
 def generate_mutations(genome, hv_regions, hvmp, nmp):
     """Determines where to place mutations on a DNA sequence."""
+    validate_genomic_regions(genome, hv_regions)
     mutations_to_add = []
     in_hv = False
     curr_hv = -1
@@ -145,6 +163,7 @@ def generate_strain(genome, coverage, hv_regions, hvmp, nmp):
 
        Produces a Strain object as output.
     """
+    validate_genomic_regions(genome, hv_regions)
     mutations = generate_mutations(genome, hv_regions, hvmp, nmp)
     strain_seq = add_mutations(genome, mutations)
     return Strain(strain_seq, coverage, mutations)
@@ -185,19 +204,7 @@ def generate_strains_from_genome(
         strains: list of Strain
             A list of Strain objects "derived" from the genome.
     """
-    prev_region_end = 0
-    for region in hypervariable_regions:
-        if len(region) != 2:
-            raise ValueError("HV region with =/= 2 coordinates.")
-        for coord in region:
-            if coord not in range(0, len(genome)):
-                raise ValueError("Invalid coord in HV region.")
-        if region[1] <= region[0]:
-            raise ValueError("Backwards HV region.")
-        if region[0] <= prev_region_end:
-            raise ValueError("HV regions out of order and/or overlapping.")
-        prev_region_end = region[1]
-
+    validate_genomic_regions(genome, hypervariable_regions)
     out_strains = []
     for cov in strain_coverages:
         out_strains.append(
