@@ -86,6 +86,22 @@ def test_gen_mutations():
     assert [m.coordinate for m in muts] == list(range(3, 10))
 
 
+def test_gen_mutations_only_substitutions():
+    g = "ATCGAACGATAAACTAGACCCAA"
+    hv_regions = [(3, 9)]
+    hvmp = 1
+    nmp = 1
+
+    muts = generate_mutations(g, hv_regions, hvmp, nmp, only_subs=True)
+    assert len(muts) == len(g)
+
+    mutated_g = add_mutations(g, muts)
+    assert len(mutated_g) == len(g)
+
+    for i in range(len(g)):
+        assert g[i] != mutated_g[i]
+
+
 def test_generate_strain():
     g = "AAAA"
     hv_regions = [(0, 1)]
