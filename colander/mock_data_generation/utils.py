@@ -132,8 +132,13 @@ def validate_genomic_regions(genome, regions):
         prev_region_end = region[1]
 
 
-def generate_mutations(genome, hv_regions, hvmp, nmp):
-    """Determines where to place mutations on a DNA sequence."""
+def generate_mutations(genome, hv_regions, hvmp, nmp, only_subs=False):
+    """Determines where to place mutations on a DNA sequence.
+
+       If only_subs is True, this will only create substitution mutations.
+       Otherwise, the type of mutation created (insertion / deletion /
+       substitution) is random.
+    """
     validate_genomic_regions(genome, hv_regions)
     mutations_to_add = []
     in_hv = False
@@ -153,7 +158,10 @@ def generate_mutations(genome, hv_regions, hvmp, nmp):
         if mp < mutation_threshold:
             # Add a random mutation
             m = Mutation(c, genome[c])
-            m.randomly_initialize()
+            if only_subs:
+                m.make_substitution()
+            else:
+                m.randomly_initialize()
             mutations_to_add.append(m)
     return mutations_to_add
 
@@ -249,4 +257,27 @@ def shear_into_reads(seq, coverage, read_length=100, error_probability=0):
     -------
         reads: list of str
     """
-    raise NotImplementedError
+    unerrored_reads = []
+    for c in range(coverage):
+        seq_copy = seq
+        while len(seq_copy) > 0:
+            # When seq_copy gets to be less than read_length characters, this
+            # will still work as intended -- it'll just add a read of length
+            # len(seq) % read_length to unerrored_reads.
+            #
+            # Also, you could argue that this is unrealistic -- among the many
+            # other things in this module that would give a biologist a
+            # headache, reads are shorn randomly, right? but for the purposes
+            # of a class project this should be ok :)
+            unerrored_reads.append(seq[0:read_length])
+            seq_copy = seq_copy[read_length:]
+
+    # apply errors to reads
+    for i in range(len(unerrored_reads)):
+        errored_read = add_mutations(
+            unerrored_reads[i],
+            generate_mutations(
+                unerrored_reads[i], [], 0, error_probability, only_subs=True
+            ),
+        )
+        unerrored_reads[i] = errored_read
