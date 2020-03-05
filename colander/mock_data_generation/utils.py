@@ -239,8 +239,13 @@ def generate_strains_from_genome(
     return out_strains
 
 
-def shear_into_reads(seq, coverage, read_length=100, error_probability=0):
+def shear_into_reads(seq, coverage, read_length, error_probability=0):
     """Breaks a sequence into reads.
+
+       This function is fairly unrealistic, compared to actual shotgun
+       sequencing. (e.g. reads are not always created from the same places in
+       the genome...) However, for the purposes of simulation for a class
+       project, this should be ok :)
 
     Parameters
     ----------
@@ -257,27 +262,29 @@ def shear_into_reads(seq, coverage, read_length=100, error_probability=0):
     -------
         reads: list of str
     """
-    unerrored_reads = []
+    reads = []
     for c in range(coverage):
+        # Shear off read_length characters from the start of the sequence
+        # repeatedly. There's probably a more efficient way to do this.
+        # e.g. AAACCCGGGTTT, read_length = 5:
+        #      AAACC
+        #           CGGGT
+        #                TT
+        # When seq_copy gets to be less than read_length characters, this
+        # will still work as intended -- it'll just add a read of length
+        # len(seq) % read_length to reads.
         seq_copy = seq
         while len(seq_copy) > 0:
-            # When seq_copy gets to be less than read_length characters, this
-            # will still work as intended -- it'll just add a read of length
-            # len(seq) % read_length to unerrored_reads.
-            #
-            # Also, you could argue that this is unrealistic -- among the many
-            # other things in this module that would give a biologist a
-            # headache, reads are shorn randomly, right? but for the purposes
-            # of a class project this should be ok :)
-            unerrored_reads.append(seq[0:read_length])
+            reads.append(seq_copy[0:read_length])
             seq_copy = seq_copy[read_length:]
 
     # apply errors to reads
-    for i in range(len(unerrored_reads)):
+    for i in range(len(reads)):
         errored_read = add_mutations(
-            unerrored_reads[i],
+            reads[i],
             generate_mutations(
-                unerrored_reads[i], [], 0, error_probability, only_subs=True
+                reads[i], [], 0, error_probability, only_subs=True
             ),
         )
-        unerrored_reads[i] = errored_read
+        reads[i] = errored_read
+    return reads

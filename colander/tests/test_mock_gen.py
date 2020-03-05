@@ -8,6 +8,7 @@ from colander.mock_data_generation.utils import (
     add_mutations,
     generate_strain,
     generate_strains_from_genome,
+    shear_into_reads,
 )
 
 
@@ -162,3 +163,14 @@ def test_genomic_region_validation():
     with pytest.raises(ValueError) as exc_info:
         validate_genomic_regions(genome, [(1, 4), (3, 4)])
     assert "overlapping" in str(exc_info.value)
+
+
+def test_read_shearing_basic():
+    seq = "AAACCCGGGTTT"
+    reads = shear_into_reads(seq, 5, 3, error_probability=0)
+    assert len(reads) == 20
+    assert set(reads) == set(["AAA", "CCC", "GGG", "TTT"])
+
+    reads = shear_into_reads(seq, 1, 5, error_probability=0)
+    assert len(reads) == 3
+    assert set(reads) == set(["AAACC", "CGGGT", "TT"])
