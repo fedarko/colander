@@ -12,9 +12,10 @@ def rand_nt(exclude=None):
 
 
 class Strain:
-    def __init__(self, seq, coverage):
+    def __init__(self, seq, coverage, originating_mutations):
         self.seq = seq
         self.coverage = coverage
+        self.originating_mutations = originating_mutations
 
 
 class Mutation:
@@ -139,10 +140,14 @@ def generate_mutations(genome, hv_regions, hvmp, nmp):
     return mutations_to_add
 
 
-def generate_strain(genome, hv_regions, hvmp, nmp):
-    """Creates and then applies mutations to a DNA sequence."""
+def generate_strain(genome, coverage, hv_regions, hvmp, nmp):
+    """Creates and then applies mutations to a DNA sequence.
+
+       Produces a Strain object as output.
+    """
     mutations = generate_mutations(genome, hv_regions, hvmp, nmp)
-    return add_mutations(genome, mutations)
+    strain_seq = add_mutations(genome, mutations)
+    return Strain(strain_seq, coverage, mutations)
 
 
 def generate_strains_from_genome(
@@ -168,6 +173,8 @@ def generate_strains_from_genome(
             with probability hypervariable_mutation_probability. In other
             regions in the genome, mutations occur with probability
             normal_mutation_probability.
+            (The coordinates defining the boundaries of these regions are
+            0-indexed.)
 
         hypervariable_mutation_probability: float (optional)
 
@@ -193,11 +200,13 @@ def generate_strains_from_genome(
 
     out_strains = []
     for cov in strain_coverages:
-        strain_seq = generate_strain(
-            genome,
-            hypervariable_regions,
-            hypervariable_mutation_probability,
-            normal_mutation_probability,
+        out_strains.append(
+            generate_strain(
+                genome,
+                cov,
+                hypervariable_regions,
+                hypervariable_mutation_probability,
+                normal_mutation_probability,
+            )
         )
-        out_strains.append(Strain(strain_seq, cov))
     return out_strains

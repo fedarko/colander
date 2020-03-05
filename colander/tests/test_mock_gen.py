@@ -5,6 +5,7 @@ from colander.mock_data_generation.utils import (
     Mutation,
     generate_mutations,
     add_mutations,
+    generate_strain,
 )
 
 
@@ -73,6 +74,7 @@ def test_add_indeterminate_mutation():
     with pytest.raises(ValueError):
         add_mutations("ACTG", [m])
 
+
 def test_gen_mutations():
     g = "ATCGAACGATAAACTAGACCCAA"
     hv_regions = [(3, 9)]
@@ -80,3 +82,19 @@ def test_gen_mutations():
     nmp = 0
     muts = generate_mutations(g, hv_regions, hvmp, nmp)
     assert [m.coordinate for m in muts] == list(range(3, 10))
+
+
+def test_generate_strain():
+    g = "AAAA"
+    hv_regions = [(0, 1)]
+    hvmp = 1
+    nmp = 0
+    for i in range(100):
+        strain = generate_strain(g, 5, hv_regions, hvmp, nmp)
+        # Since there's a normal mutation probability of 0, the areas outside
+        # the hypervariable region (the first "AA") should be unmodified
+        assert strain.seq.endswith("AA")
+        assert strain.coverage == 5
+        # Since there's a hypervariable region mutation probability of 1, there
+        # should have been 2 mutations for each of the 2 bases in the HV region
+        assert len(strain.originating_mutations) == 2
