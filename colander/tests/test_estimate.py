@@ -1,5 +1,7 @@
+import pytest
 import networkx as nx
 from colander.estimate import (
+    GreedyError,
     CycleSet,
     Cycle,
     get_cov,
@@ -61,3 +63,13 @@ def test_get_max_weight_edge_from_node():
     g = get_test_graph()
     assert get_max_weight_edge_from_node(g, 1, []) == (1, 2)
     assert get_max_weight_edge_from_node(g, 1, [(1, 2)]) in ((1, 3), (1, 4))
+
+
+def test_trigger_greedyerror():
+    g = get_test_graph()
+    covdict = {}
+    for e in g.edges:
+        covdict[e] = {"cov": 0}
+    nx.set_edge_attributes(g, covdict)
+    with pytest.raises(GreedyError):
+        get_max_weight_edge_from_node(g, 1, [])
