@@ -169,15 +169,41 @@ def test_genomic_region_validation():
 def test_kmer_shearing_basic():
     seq = "AAACCCGGGTTT"
     kmers = shear_into_kmers(seq, 2, 3, error_probability=0)
-    assert len(kmers) == 20
+    assert len(kmers) == 24
     assert set(kmers) == set(
-        ["AAA", "AAC", "ACC", "CCC", "CCG", "CGG", "GGG", "GGT", "GTT", "TTT"]
+        [
+            "AAA",
+            "AAC",
+            "ACC",
+            "CCC",
+            "CCG",
+            "CGG",
+            "GGG",
+            "GGT",
+            "GTT",
+            "TTT",
+            "TTA",
+            "TAA",
+        ]
     )
 
     kmers = shear_into_kmers(seq, 1, 8, error_probability=0)
-    assert len(kmers) == 5
+    assert len(kmers) == 12
     assert set(kmers) == set(
-        ["AAACCCGG", "AACCCGGG", "ACCCGGGT", "CCCGGGTT", "CCGGGTTT"]
+        [
+            "AAACCCGG",
+            "AACCCGGG",
+            "ACCCGGGT",
+            "CCCGGGTT",
+            "CCGGGTTT",
+            "CGGGTTTA",
+            "GGGTTTAA",
+            "GGTTTAAA",
+            "GTTTAAAC",
+            "TTTAAACC",
+            "TTAAACCC",
+            "TAAACCCG",
+        ]
     )
 
 
