@@ -114,17 +114,17 @@ def peel_max_weight_cycle(G):
     prev_edge = get_max_weight_edge_from_node(G, starting_node, [])
 
     cycle_min_weight = get_cov(G, prev_edge)
-    curr_node = prev_edge[1]
     cycle_edges = [prev_edge]
-    while starting_node != curr_node:
-        curr_node = prev_edge[1]
+    while starting_node != prev_edge[1]:
+        print("went from {} to {}.".format(prev_edge[0], prev_edge[1]))
         # pick max weight outgoing edge that we haven't seen before in
         # cycle_edges and follow.
-        next_edge = get_max_weight_edge_from_node(G, curr_node, cycle_edges)
+        next_edge = get_max_weight_edge_from_node(G, prev_edge[1], cycle_edges)
         # Update the cycle
         cycle_edges.append(next_edge)
         # Decrease the "capacity" of this cycle if necessary
         cycle_min_weight = min(cycle_min_weight, get_cov(G, next_edge))
+        prev_edge = next_edge
 
     return Cycle(cycle_edges, cycle_min_weight)
 

@@ -6,6 +6,8 @@ from colander.estimate import (
     Cycle,
     get_cov,
     get_max_weight_edge_from_node,
+    remove_cycle_impact,
+    peel_max_weight_cycle,
 )
 
 
@@ -73,3 +75,26 @@ def test_trigger_greedyerror():
     nx.set_edge_attributes(g, covdict)
     with pytest.raises(GreedyError):
         get_max_weight_edge_from_node(g, 1, [])
+
+
+def test_remove_cycle_impact():
+    g = get_test_graph()
+    c = Cycle(((0, 1), (1, 2), (2, 5), (5, 6), (6, 0)), 33)
+    remove_cycle_impact(g, c)
+    assert get_cov(g, (0, 1)) == 7
+    assert get_cov(g, (1, 2)) == -13
+    assert get_cov(g, (2, 5)) == -13
+    assert get_cov(g, (5, 6)) == 7
+    assert get_cov(g, (6, 0)) == 7
+
+
+def test_peel():
+    g = get_test_graph()
+    c = peel_max_weight_cycle(g)
+    assert len(c.edges) == 5
+    assert c.weight == 20
+    assert (0, 1) in c.edges
+    assert (1, 2) in c.edges
+    assert (2, 5) in c.edges
+    assert (5, 6) in c.edges
+    assert (6, 0) in c.edges
