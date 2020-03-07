@@ -1,5 +1,10 @@
 import networkx as nx
-from colander.estimate import CycleSet, Cycle, get_cov
+from colander.estimate import (
+    CycleSet,
+    Cycle,
+    get_cov,
+    get_max_weight_edge_from_node,
+)
 
 
 def get_test_graph():
@@ -50,3 +55,9 @@ def test_cycle_set_conformity_score():
     assert cs.conformity_score(g) == 6000
     cs.add(c)
     assert cs.conformity_score(g) == 885
+
+
+def test_get_max_weight_edge_from_node():
+    g = get_test_graph()
+    assert get_max_weight_edge_from_node(g, 1, []) == (1, 2)
+    assert get_max_weight_edge_from_node(g, 1, [(1, 2)]) in ((1, 3), (1, 4))
