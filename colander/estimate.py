@@ -69,10 +69,8 @@ class CycleSet:
            (that edge's coverage) squared is incurred.
         """
         score = 0
-        print("doin it")
         for e in G.edges:
             penalty = (get_cov(G, e) - self.cycle_coverage(e)) ** 2
-            print("edge {} causes penalty {}".format(e, penalty))
             score += penalty
         return score
 
@@ -116,7 +114,6 @@ def peel_max_weight_cycle(G):
     cycle_min_weight = get_cov(G, prev_edge)
     cycle_edges = [prev_edge]
     while starting_node != prev_edge[1]:
-        print("went from {} to {}.".format(prev_edge[0], prev_edge[1]))
         # pick max weight outgoing edge that we haven't seen before in
         # cycle_edges and follow.
         next_edge = get_max_weight_edge_from_node(G, prev_edge[1], cycle_edges)

@@ -49,7 +49,6 @@ def test_cycle_set_cycle_coverage():
     cs = CycleSet()
     assert cs.cycle_coverage((0, 1)) == 0
     cs.add(c)
-    print(cs.cycles)
     assert cs.cycle_coverage((0, 1)) == 33
 
 
