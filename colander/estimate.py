@@ -98,17 +98,18 @@ def get_max_weight_edge_from_node(G, n, seen_edges):
 
 def peel_max_weight_cycle(G):
     # start at a 1-in 1-out node to make sure the algorithm doesn't get "lost"
-    starting_node = None
-    for n in G.nodes:
-        if G.in_degree(n) == G.out_degree(n) == 1:
-            starting_node = n
-            break
-    if starting_node is None:
-        raise ValueError(
-            "Graph has no one-in-one-out nodes. This algorithm isn't that "
-            "robust yet..."
-        )
+    #starting_node = None
+    #for n in G.nodes:
+    #    if G.in_degree(n) == G.out_degree(n) == 1:
+    #        starting_node = n
+    #        break
+    #if starting_node is None:
+    #    raise ValueError(
+    #        "Graph has no one-in-one-out nodes. This algorithm isn't that "
+    #        "robust yet..."
+    #    )
 
+    starting_node = list(G.nodes)[0]
     prev_edge = get_max_weight_edge_from_node(G, starting_node, [])
 
     cycle_min_weight = get_cov(G, prev_edge)

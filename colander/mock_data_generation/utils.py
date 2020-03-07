@@ -242,7 +242,7 @@ def generate_strains_from_genome(
 
 
 def shear_into_kmers(seq, coverage, k, error_probability=0):
-    """Generates the k-mer composition of a sequence, with a specified
+    """Generates the cyclic! k-mer composition of a sequence, with a specified
        coverage. Also randomly applies substitution "errors" to these k-mers.
 
        Treating these k-mers as "reads" is a bit unrealistic (since this
@@ -276,8 +276,19 @@ def shear_into_kmers(seq, coverage, k, error_probability=0):
         #        ACCCGGGT
         #         CCCGGGTT
         #          CCGGGTTT
+        #           CGGGTTTA
+        #            GGGTTTAA
+        #             GGTTTAAA
+        #              GTTTAAAC
+        #               TTTAAACC
+        #                TTAAACCC
+        #                 TAAACCCG
         for i in range(len(seq) - k + 1):
             kmers.append(seq[i : i + k])
+        j = 1
+        for i in range(len(seq) - k + 1, len(seq)):
+            kmers.append(seq[i:] + seq[:j])
+            j += 1
 
     # randomly apply substitution errors to k-mers
     for i in range(len(kmers)):
