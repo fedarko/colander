@@ -8,6 +8,7 @@ from colander.estimate import (
     get_max_weight_edge_from_node,
     remove_cycle_impact,
     peel_max_weight_cycle,
+    greedy_strain_estimation,
 )
 
 
@@ -98,3 +99,18 @@ def test_peel():
     assert (2, 5) in c.edges
     assert (5, 6) in c.edges
     assert (6, 0) in c.edges
+
+
+def test_gse_perfect():
+    g = get_test_graph()
+    cs = greedy_strain_estimation(g, 3)
+    assert set([c.weight for c in cs.cycles]) == set([20, 10, 10])
+
+
+def test_gse_partial():
+    g = get_test_graph()
+    cs = greedy_strain_estimation(g, 1)
+    assert set([c.weight for c in cs.cycles]) == set([20])
+
+    cs = greedy_strain_estimation(g, 2)
+    assert set([c.weight for c in cs.cycles]) == set([20, 10])

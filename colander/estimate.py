@@ -161,7 +161,7 @@ def greedy_strain_estimation(G, N):
         except GreedyError:
             # We seem to have exhausted the "capacity" of the graph
             break
-        CycleSet.add(cycle)
+        cycles.add(cycle)
         # Here's the critical thing: modify the graph to remove the "impact" of
         # the selected cycle.
         remove_cycle_impact(Gc, cycle)
